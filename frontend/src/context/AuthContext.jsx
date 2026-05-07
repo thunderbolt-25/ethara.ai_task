@@ -4,8 +4,18 @@ const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(() => {
-    const stored = localStorage.getItem("ttm_user");
-    return stored ? JSON.parse(stored) : null;
+    try {
+      const stored = localStorage.getItem("ttm_user");
+      if (!stored || stored === "undefined" || stored === "null") {
+        return null;
+      }
+      const parsed = JSON.parse(stored);
+      return parsed && typeof parsed === "object" ? parsed : null;
+    } catch {
+      localStorage.removeItem("ttm_user");
+      localStorage.removeItem("ttm_token");
+      return null;
+    }
   });
 
   const login = (authData) => {
